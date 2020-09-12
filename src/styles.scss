@@ -8,6 +8,15 @@ p {
   margin: 0;
 }
 
+body.resizing-el {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: n-resize;
+}
+
 .day {
   display: flex;
   width: 100%;
@@ -17,7 +26,7 @@ p {
   }
 
   .left {
-    padding: 20px 10px 20px 20px;
+    padding: 0 10px 20px 20px;
     height: 90vh;
     overflow: auto;
     display: flex;
@@ -28,9 +37,11 @@ p {
     .day-part {
       width: calc(100% - 40px);
       position: relative;
+
       &:nth-child(odd) {
         background: #ababab;
       }
+
       &:nth-child(even) {
         background: #f3f3f3;
       }
@@ -54,14 +65,14 @@ p {
       width: calc(100% - 80px);
       background: coral;
       border-radius: 7px;
-      transition: 0.3s all ease;
+      transition: 50ms all ease;
       padding: 5px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
 
       &:hover {
-        box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
       }
 
       .part-details {
@@ -90,6 +101,6 @@ p {
   }
 
   .right {
-    padding: 20px 20px 20px 10px;
+    padding: 0px 20px 20px 10px;
   }
 }

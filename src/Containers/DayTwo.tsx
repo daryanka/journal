@@ -1,4 +1,5 @@
-import React, {FC, useRef, useState} from "react";
+import React, {FC, useRef, useState, useCallback} from "react";
+import {Simulate} from "react-dom/test-utils";
 
 const times = [
   {t1: "00:00", t2: "00:30"},
@@ -48,46 +49,225 @@ const times = [
   {t1: "22:00", t2: "22:30"},
   {t1: "22:30", t2: "23:00"},
   {t1: "23:00", t2: "23:30"},
-  {t1: "23:30", t2: "00:00"},
+  {t1: "23:30", t2: "24:00"},
 ]
+
+const timeToMinutesNumber = (time: string): number => {
+  const [hours, minutes] = time.split(":")
+  const minutesFromHours = parseInt(hours) * 60
+  const minutesInt = parseInt(minutes)
+
+  return minutesFromHours + minutesInt
+}
+
+const minutesToTimeString = (minutes: number): string => {
+  let hours = `${Math.floor(minutes / 60)}`
+  let minutesString = `${minutes - Math.floor(minutes / 60) * 60}`
+  if (minutesString === "0") {
+    minutesString = "00"
+  }
+  if (Math.floor(minutes / 60) < 10) {
+    hours = `0${hours}`
+  }
+
+  return `${hours}:${minutesString}`
+}
 
 interface TimeType {
   start: string
   end: string
   title: string
   description: string
+  category: string
 }
 
-const boxHeight = 50;
+const boxHeight = 80;
 
 const DayTwo: FC = () => {
+  const leftBoxRef = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<TimeType[]>([
     {
       description: "description here description here description here description here description here description here description heredescription here description here",
       start: "01:30",
       end: "02:00",
-      title: "Work"
+      title: "Work",
+      category: "Work"
+    },
+    {
+      description: "description here description here description here description here description here description here description heredescription here description here",
+      start: "03:30",
+      end: "05:00",
+      title: "Work Two",
+      category: "Work"
     }
   ]);
 
-  const handleClick = (e: MouseEvent) => {
-    if (e.target) {
-      const div = e.target as HTMLDivElement
+  const calculateLatestAllowedEnd = (stateIndex: number, currentEnd: number): number => {
+    const copyState = [...state];
+    // Remove state index
+    copyState.splice(stateIndex, 1)
+    if (copyState.length === 0) {
+      return 1440
+    }
 
-      if (div.className === "bottom-handle") {
-        // Get state index
-        console.log(e)
+    let latestEnd = 0
+    // Loop through remaining state and find the earliest start time that is after the currentEnd
+    for (let i = 0; i < copyState.length; i++) {
+      const startNumber = timeToMinutesNumber(copyState[i].start)
+      if (startNumber >= currentEnd && startNumber >= latestEnd) {
+        latestEnd = startNumber
       }
     }
+
+    if (latestEnd === 0) {
+      return 1440
+    }
+
+    return latestEnd
   }
 
-  React.useEffect(() => {
-    document.addEventListener("mousedown", handleClick)
+  const calculateEarliestAllowedStart = (stateIndex: number, currentStart: number): number => {
+    const copyState = [...state];
+    // Remove state index
+    copyState.splice(stateIndex, 1)
+    if (copyState.length === 0) {
+      return 0
+    }
+
+    let earliestStart = 1440
+    // Loop through remaining state and find the earliest start time that is after the currentEnd
+    for (let i = 0; i < copyState.length; i++) {
+      const endNumber = timeToMinutesNumber(copyState[i].end)
+      if (endNumber <= currentStart && endNumber <= earliestStart) {
+        earliestStart = endNumber
+      }
+    }
+
+    if (earliestStart === 1440) {
+      return 0
+    }
+
+    return earliestStart
+  }
+
+  const MoveEndDown = (stateIndex: number, times = 1) => {
+    setState(prev => {
+      const copyState = [...prev]
+      // Get state index
+      const newEndTimeMinutes = timeToMinutesNumber(copyState[stateIndex].end) + (30 * times)
+      // Check its not the end
+      const latestAllowedEndTime = calculateLatestAllowedEnd(stateIndex, timeToMinutesNumber(copyState[stateIndex].end))
+      if (newEndTimeMinutes >= latestAllowedEndTime) {
+        copyState[stateIndex].end = minutesToTimeString(latestAllowedEndTime)
+      } else {
+        copyState[stateIndex].end = minutesToTimeString(newEndTimeMinutes)
+      }
+      return copyState
+    })
+  }
+
+  const MoveStartDown = (stateIndex: number, times = 1) => {
+    setState(prev => {
+      const copyState = [...prev]
+      // Get state index
+      const newStartTimeMinutes = timeToMinutesNumber(copyState[stateIndex].start) + (30 * times)
+
+      // Make sure start cannot go beyond end
+      if (newStartTimeMinutes >= timeToMinutesNumber(copyState[stateIndex].end)) {
+        copyState[stateIndex].start = minutesToTimeString(timeToMinutesNumber(copyState[stateIndex].end) - 30)
+        return copyState
+      }
+
+      copyState[stateIndex].start = minutesToTimeString(newStartTimeMinutes)
+      return copyState
+    })
+  }
+
+  const MoveEndUp = (stateIndex: number, times = 1) => {
+    setState(prev => {
+      const copyState = [...prev]
+      // Get state index
+      const newEndTimeMinutes = timeToMinutesNumber(copyState[stateIndex].end) - (30 * times)
+
+      // Make sure end is not above start
+      if (newEndTimeMinutes <= timeToMinutesNumber(copyState[stateIndex].start)) {
+        copyState[stateIndex].end = minutesToTimeString(timeToMinutesNumber(copyState[stateIndex].start) + 30)
+        return copyState
+      }
+
+      copyState[stateIndex].end = minutesToTimeString(newEndTimeMinutes)
+      return copyState
+    })
+  }
+
+  const MoveStartUp = (stateIndex: number, times = 1) => {
+    setState(prev => {
+      const copyState = [...prev]
+      // Get state index
+      const newStartTimeMinutes = timeToMinutesNumber(copyState[stateIndex].start) - (30 * times)
+      const earliestAllowedStart = calculateEarliestAllowedStart(stateIndex, timeToMinutesNumber(copyState[stateIndex].start))
+      if (newStartTimeMinutes <= earliestAllowedStart) {
+        copyState[stateIndex].start = minutesToTimeString(earliestAllowedStart)
+      } else {
+        copyState[stateIndex].start = minutesToTimeString(newStartTimeMinutes)
+      }
+      return copyState
+    })
+  }
+
+  const handleMouseDown = useCallback((e: MouseEvent) => {
+    let moving = false
+    if (e.target) {
+      const div = e.target as HTMLDivElement
+      if (div.className === "bottom-handle" || div.className === "top-handle") {
+        // Mouse Move Handler
+        const mouseMoveFunc = (e: MouseEvent) => {
+          // Add resizing-el to body className
+          document.body.classList.add("resizing-el")
+          const distanceBetweenMouseAndBottomHandle = e.y - div!.getBoundingClientRect().top - 9
+          const stateIndex = parseInt(div.dataset.stateIndex as string)
+
+          if (distanceBetweenMouseAndBottomHandle > (boxHeight - 5) && !moving) {
+            const times = Math.ceil(distanceBetweenMouseAndBottomHandle / boxHeight)
+            moving = true
+            div.className === "bottom-handle" ? MoveEndDown(stateIndex, times) : MoveStartDown(stateIndex, times)
+            setTimeout(() => {
+              moving = false
+            }, 50)
+          } else if (distanceBetweenMouseAndBottomHandle < -5 && !moving) {
+            const times = Math.ceil(Math.abs(distanceBetweenMouseAndBottomHandle) / boxHeight)
+            moving = true
+            div.className === "bottom-handle" ? MoveEndUp(stateIndex, times) : MoveStartUp(stateIndex, times)
+            setTimeout(() => {
+              moving = false
+            }, 50)
+          }
+        }
+        //
+
+        const removeListener = () => {
+          document.body.classList.remove("resizing-el")
+          document.removeEventListener("mousemove", mouseMoveFunc)
+          document.removeEventListener("mouseup", removeListener)
+        }
+
+        document.addEventListener("mousemove", mouseMoveFunc)
+        document.addEventListener("mouseup", removeListener)
+      }
+    }
   }, [])
+
+  React.useEffect(() => {
+    document.addEventListener("mousedown", handleMouseDown)
+
+    return () => document.removeEventListener("mousedown", handleMouseDown)
+  }, [])
+
+  console.log(state[0].end)
 
   return (
     <div className={"day"}>
-      <div className="left">
+      <div ref={leftBoxRef} className="left">
         {times.map((day, i) => {
           return (
             <div style={{
@@ -119,9 +299,10 @@ const DayTwo: FC = () => {
           return (
             <div
               className={"allocated-part"}
+              id={"testing"}
               style={{
                 height: `${distance * boxHeight - 10}px`,
-                top: `${marginCount * boxHeight + 25}px`
+                top: `${marginCount * boxHeight + 5}px`
               }} key={`${part.title}-${i}`}>
               <div className={"part-details"}>
                 <div data-state-index={i} className="top-handle"/>
