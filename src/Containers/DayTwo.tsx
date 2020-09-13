@@ -263,8 +263,6 @@ const DayTwo: FC = () => {
     return () => document.removeEventListener("mousedown", handleMouseDown)
   }, [])
 
-  console.log(state[0].end)
-
   return (
     <div className={"day"}>
       <div ref={leftBoxRef} className="left">
