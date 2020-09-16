@@ -1,19 +1,20 @@
 import React, {FC} from "react";
 import ReactDOM from "react-dom";
+import {Provider} from "react-redux";
 import "./styles.scss";
-import Day from "./Containers/Day";
-import DayTwo from "./Containers/DayTwo";
+import store from "./store";
+import App from "./Containers/App";
+import history from "./history";
+import {Router} from "react-router-dom";
 
-const App: FC = () => {
+const RootApp: FC = () => {
   return(
-    <div>
-      <div style={{
-        height: "100px",
-        background: "tomato"
-      }}>Header</div>
-      <DayTwo />
-    </div>
+    <Provider store={store}>
+      <Router history={history}>
+        <App />
+      </Router>
+    </Provider>
   )
 }
 
-ReactDOM.render(<App />, document.getElementById("root"))
+ReactDOM.render(<RootApp />, document.getElementById("root"))
