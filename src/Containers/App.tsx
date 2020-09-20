@@ -1,33 +1,33 @@
 import React, {FC} from "react";
-import Day from "./Day";
-import axios from "axios";
+import NavBar from "./NavBar";
+import {Redirect, Route, Switch,} from "react-router-dom";
+import PrivateRoute from "../Components/PrivateRoute";
+import Login from "./Login";
+import Register from "./Register";
+import Dashboard from "./Dashboard";
 
 const App: FC = () => {
-  const fetchData = async () => {
-    const res = await axios.post("http://localhost:8080/entries/range", {
-      "from": "2020-09-01",
-      "to": "2020-09-10"
-    }, {
-      headers: {
-        "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjIsImV4cCI6MTYwMDI5MjUzMiwiaWF0IjoxNjAwMjg4OTMyLCJpc3MiOiJqb3VybmFsX2FwaSJ9.-tWxhf5ceDmO0HOxp2xyLpGKVaLDYptoSYeQw89XRb0`
-      }
-    })
-
-    console.log(res)
-  }
-
-  React.useEffect(() => {
-    fetchData()
-  }, [])
-
   return(
-    <div>
-      <div style={{
-        height: "100px",
-        background: "tomato"
-      }}>Header</div>
-      <Day />
+    <div className={"app-wrapper"}>
+      <NavBar/>
+      <div className={"content-wrapper"}>
+        <Switch>
+          <Route exact path={"/"} component={Login}/>
+          <Route exact path={"/register"} component={Register}/>
+          <PrivateRoute exact component={Dashboard} path={"/dashboard"} />
+          <PrivateRoute exact component={Comp} path={"/week"}/>
+          <PrivateRoute exact component={Comp} path={"/day/:day"}/>
+          <Redirect to={"/"}/>
+        </Switch>
+      </div>
     </div>
+  )
+}
+
+const Comp = () => {
+  console.log("inside comp")
+  return (
+    <h1>Private</h1>
   )
 }
 

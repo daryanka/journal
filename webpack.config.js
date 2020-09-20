@@ -6,11 +6,16 @@ const webpack = require("webpack")
 module.exports = {
   output: {
     path: path.resolve(__dirname, "build"),
-    filename: "bundle.js"
+    filename: "bundle.js",
+    publicPath: "/"
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx"]
   },
+  entry: {
+    app: './src/index.tsx',
+  },
+  devtool: "source-map",
   module: {
     rules: [
       {
