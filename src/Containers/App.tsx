@@ -5,6 +5,7 @@ import PrivateRoute from "../Components/PrivateRoute";
 import Login from "./Login";
 import Register from "./Register";
 import Dashboard from "./Dashboard";
+import Footer from "./Footer";
 
 const App: FC = () => {
   return(
@@ -20,6 +21,7 @@ const App: FC = () => {
           <Redirect to={"/"}/>
         </Switch>
       </div>
+      <Footer />
     </div>
   )
 }

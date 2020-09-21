@@ -31,7 +31,10 @@
     "typescript": "^4.0.2",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^3.11.0",
+    "autoprefixer": "^10.0.0",
+    "postcss": "^8.0.6",
+    "postcss-loader": "^4.0.2"
   },
   "dependencies": {
     "@types/js-cookie": "^2.2.6",
@@ -39,6 +42,7 @@
     "@types/react-query": "^1.1.2",
     "@types/react-redux": "^7.1.9",
     "@types/react-router-dom": "^5.1.5",
+    "@types/yup": "^0.29.7",
     "axios": "^0.20.0",
     "formik": "^2.1.5",
     "history": "4.10.1",

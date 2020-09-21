@@ -1,4 +1,7 @@
 $black: #1c1c1c;
+$white: #fafafa;
+$error: #ea4f4f;
+$psize: 16px;
 
 * {
   margin: 0;
@@ -6,6 +9,26 @@ $black: #1c1c1c;
   box-sizing: border-box;
   color: $black;
   font-family: 'Roboto', sans-serif;
+}
+
+html, body, #root {
+  background: $white;
+  height: 100%;
+}
+
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+
+  .content-wrapper {
+    flex: 1 0 auto;
+  }
+}
+
+footer {
+  flex-shrink: 0;
 }
 
 a,

@@ -1,10 +1,11 @@
 import React, {FC} from "react";
 import {FormikProps, useField} from "formik";
+import _ from "lodash";
 
 
 interface propsTypes extends React.InputHTMLAttributes<HTMLInputElement> {
   name: string
-  label?: string
+  label: string
   customError?: string
 }
 
@@ -17,10 +18,11 @@ const InputField: FC<propsTypes> = (props) => {
 
     return meta.touched && meta.error ? <p className={"error-msg"}>{meta.error}</p> : null
   }
+
   return(
     <div className={"input-wrapper"}>
-      {props.label && <label htmlFor={props.name}>{props.label}</label>}
-      <input {...field} {...props} />
+      <input className={`${meta.touched && meta.error ? "error" : ""}`} {...field} {...props} placeholder={" "} />
+      <label htmlFor={props.name}>{props.label}</label>
       {showErrMsg()}
     </div>
   )
