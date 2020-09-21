@@ -1,3 +1,15 @@
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 50px $white inset !important;
+}
+
 .input-wrapper {
   position: relative;
   padding-top: 20px;
@@ -14,7 +26,7 @@
   }
 
   input {
-    transition: all 200ms ease;
+    transition: border 200ms ease;
     position: relative;
     z-index: 3;
     height: 36px;
@@ -22,10 +34,11 @@
     padding: 10px;
     outline: none;
     border: none;
-    background: transparent;
+    background: transparent !important;
     border-bottom: 2px solid $black;
 
     &:focus + label, &:not(:placeholder-shown) + label {
+      z-index: 4;
       transform: translateY(-200%);
       font-size: 15px;
     }
