@@ -1,7 +1,10 @@
-$black: #1c1c1c;
+$black: #2b2a2a;
+//#1C1C1C
 $white: #fafafa;
 $error: #ea4f4f;
 $psize: 16px;
+$darkGray: lighten($black, 40%);
+$boxShadow: 0 0 15px rgba(0,0,0,0.3);
 
 * {
   margin: 0;

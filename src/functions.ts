@@ -7,7 +7,7 @@ import store, {RootState} from "./store";
 type Methods = "GET" | "PUT" | "PATCH" | "POST" | "DELETE";
 
 const functions = {
-  send: async (method: Methods, url: string, data?: object, additionalConfig?: object) => {
+  send: (method: Methods, url: string, data?: object, additionalConfig?: object) => {
     const headers: {
       Authorization?: string
     } = {};
@@ -18,22 +18,27 @@ const functions = {
 
     url = `http://localhost:8080${url}`;
 
+
     const config = _.merge(additionalConfig ? additionalConfig : {}, {
       method: method,
       url: url,
       headers: headers,
-      data: data
+      data: data,
+      validateStatus: (status: number) => {
+        return true // Never return error
+      }
     });
 
-    try {
-      return await axios(config);
-    } catch (err) {
-      if (err.response.status === 401) {
-        cookie.remove("token");
-        history.replace("/login")
-      }
-      return err;
-    }
+    return axios(config);
+    // try {
+    //   return await axios(config);
+    // } catch (err) {
+    //   if (err.response.status === 401) {
+    //     cookie.remove("token");
+    //     history.replace("/login")
+    //   }
+    //   return err;
+    // }
   },
 
   get: (url: string, config?: object) => {
@@ -56,7 +61,7 @@ const functions = {
     history.push(url)
   },
 
-  isLoggedIn: () : boolean => {
+  isLoggedIn: (): boolean => {
     const state = store.getState() as RootState;
     return state.auth.loggedIn
   },

@@ -2,7 +2,7 @@ import React, {FC} from "react";
 import NavBar from "./NavBar";
 import {Redirect, Route, Switch,} from "react-router-dom";
 import PrivateRoute from "../Components/PrivateRoute";
-import Login from "./Login";
+import Login from "./Login/Login";
 import Register from "./Register";
 import Dashboard from "./Dashboard";
 import Footer from "./Footer";

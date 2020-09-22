@@ -2,6 +2,7 @@ const HtmlPlugin = require("html-webpack-plugin")
 const path = require("path")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const webpack = require("webpack")
+const ErrorOverlayPlugin = require('error-overlay-webpack-plugin')
 
 module.exports = {
   output: {
@@ -15,7 +16,7 @@ module.exports = {
   entry: {
     app: './src/index.tsx',
   },
-  devtool: "source-map",
+  devtool: 'cheap-module-source-map',
   module: {
     rules: [
       {
@@ -73,7 +74,8 @@ module.exports = {
       "process.env": {
         "NODE_ENV": JSON.stringify(process.env.NODE_ENV)
       }
-    })
+    }),
+    new ErrorOverlayPlugin()
   ],
 
   devServer: {

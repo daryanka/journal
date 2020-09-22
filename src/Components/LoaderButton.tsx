@@ -5,16 +5,16 @@ interface loaderButtonProp extends React.DetailedHTMLProps<React.ButtonHTMLAttri
   disabled?: boolean
 }
 
-const LoaderButton: FC<loaderButtonProp> = (props) => {
+const LoaderButton: FC<loaderButtonProp> = ({loading, children,...props}) => {
   return (
-    <div className={`button-wrapper ${props.loading ? "loading" : ""}`}>
+    <div className={`button-wrapper ${loading ? "loading" : ""}`}>
       <button {...props}>
         <span className={`spinner`}>
           <span className="bounce1"></span>
           <span className="bounce2"></span>
           <span className="bounce3"></span>
         </span>
-        <span className={"child"}>{props.children}</span>
+        <span className={"child"}>{children}</span>
       </button>
     </div>
   )
