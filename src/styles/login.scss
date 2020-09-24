@@ -5,6 +5,11 @@
   padding: 30px;
   width: 50%;
   margin: 50px auto auto;
+  max-width: 890px;
+
+  form {
+    margin-top: 20px;
+  }
 
   .button-wrapper {
     display: flex;
@@ -12,5 +17,19 @@
       margin-top: 20px;
       margin-left: auto;
     }
+  }
+
+  @include until(1000px) {
+    min-width: 60%;
+  }
+
+  @include until(760px) {
+    min-width: 90%;
+  }
+
+  @include until(450px) {
+    min-width: 100%;
+    box-shadow: unset;
+    padding: 15px;
   }
 }

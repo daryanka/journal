@@ -86,14 +86,14 @@ const Day: FC = () => {
   const leftBoxRef = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<TimeType[]>([
     {
-      description: "description here description here description here description here description here description here description heredescription here description here",
+      description: "description here description here description here description here description here description here description here description here description here",
       start: "01:30",
       end: "02:00",
       title: "Work",
       category: "Work"
     },
     {
-      description: "description here description here description here description here description here description here description heredescription here description here",
+      description: "description here description here description here description here description here description here description here description here description here",
       start: "03:30",
       end: "05:00",
       title: "Work Two",

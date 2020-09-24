@@ -1,9 +1,9 @@
 import React, {FC, useState} from "react";
 import {Link} from "react-router-dom";
 import {useSelector} from "react-redux";
-import {RootState} from "../store";
+import {RootState} from "../../store";
 import moment from "moment";
-import functions from "../functions";
+import functions from "../../functions";
 
 interface linkType {
   to: string
@@ -31,6 +31,10 @@ const NavBar: FC = () => {
       to: `/day/${today}`,
       title: "Today"
     },
+    {
+      to: "/logout",
+      title: "Logout"
+    }
   ]
 
   const renderLinks = (links: linkType[]) => {

@@ -3,26 +3,33 @@ import {Form, Formik, FormikHelpers} from "formik";
 import InputField from "../../Components/InputField";
 import * as Yup from "yup";
 import LoaderButton from "../../Components/LoaderButton";
-import useLogin from "./useLogin";
+import useRegister from "./useRegister";
+import {Link} from "react-router-dom";
 
-interface loginFormType {
+interface registerFormType {
   email: string
   password: string
+  password_confirmation: string
 }
 
-const loginFormSchema = Yup.object().shape({
+const registerFormSchema = Yup.object().shape({
   email: Yup.string().email().required().max(255),
-  password: Yup.string().required().min(6).max(50)
+  password: Yup.string().required().min(6).max(50),
+  password_confirmation: Yup.string().required().min(6).max(50).oneOf([Yup.ref("password"), ""], "Must match password").label("Confirm Password")
 })
 
-const Login: FC = () => {
-  const submitLogin = useLogin()
-  const [apiError, setAPIError] = useState("");
+const Register: FC = () => {
+  const submitRegister = useRegister()
+  const [apiError, setAPIError] = useState<string | React.ReactElement>("");
 
-  const handleSubmit = async (values: loginFormType, helpers: FormikHelpers<loginFormType>) => {
-    const errString = await submitLogin(values)
+  const handleSubmit = async (values: registerFormType, helpers: FormikHelpers<registerFormType>) => {
+    const errString = await submitRegister(values)
 
     if (errString) {
+      if (errString === "EMAIL_USED") {
+        setAPIError(<>This Email is already in use, login <strong><Link to={"/login"}>here.</Link></strong></>)
+        return
+      }
       setAPIError(errString)
     }
   }
@@ -30,13 +37,14 @@ const Login: FC = () => {
   return (
     <div className={"login-wrapper"}>
       <div className="box">
-        <h2>Login</h2>
+        <h2>Register</h2>
         <Formik
           initialValues={{
             email: "",
-            password: ""
+            password: "",
+            password_confirmation: ""
           }}
-          validationSchema={loginFormSchema}
+          validationSchema={registerFormSchema}
           onSubmit={handleSubmit}
         >
           {({dirty, isValid, isSubmitting}) => {
@@ -44,6 +52,7 @@ const Login: FC = () => {
               <Form>
                 <InputField name={"email"} label={"Email*"}/>
                 <InputField type={"password"} name={"password"} label={"Password*"}/>
+                <InputField type={"password"} name={"password_confirmation"} label={"Confirm Password*"}/>
                 {apiError !== "" && <p className={"error-msg"}>{apiError}</p>}
                 <LoaderButton loading={isSubmitting} disabled={!dirty || !isValid || isSubmitting}>Submit</LoaderButton>
               </Form>
@@ -55,4 +64,4 @@ const Login: FC = () => {
   )
 }
 
-export default Login
+export default Register

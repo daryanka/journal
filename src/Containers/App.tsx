@@ -1,23 +1,68 @@
-import React, {FC} from "react";
-import NavBar from "./NavBar";
+import React, {FC, useState} from "react";
+import NavBar from "./Nav/NavBar";
 import {Redirect, Route, Switch,} from "react-router-dom";
 import PrivateRoute from "../Components/PrivateRoute";
 import Login from "./Login/Login";
-import Register from "./Register";
+import Register from "./Register/Register";
 import Dashboard from "./Dashboard";
 import Footer from "./Footer";
+import {useDispatch} from "react-redux";
+import cookie from "js-cookie";
+import functions from "../functions";
+import {NEW_USER} from "../reducers/authReducer";
+import FullScreenSpinner from "../Components/FullScreenSpinner";
+import PublicRoute from "../Components/PublicRoute";
+import Logout from "./Logout";
 
 const App: FC = () => {
+  const [loadingAuth, setLoadingAuth] = useState(false)
+  const dispatch = useDispatch()
+  React.useEffect(() => {
+    handleLoggedInUser()
+  }, [])
+
+  const handleLoggedInUser = async () => {
+    const token = cookie.get("token")
+    if (token) {
+      setLoadingAuth(true)
+      // Get ME
+      const res = await functions.get("/auth/me")
+      const err = functions.error(res)
+      if (err) {
+        setLoadingAuth(false)
+        return
+      }
+
+      // Update Redux State
+      dispatch({
+        type: NEW_USER,
+        payload: {
+          email: res.data.email,
+          id: res.data.id
+        }
+      })
+
+      setLoadingAuth(false)
+
+      functions.pushTo("/week")
+    }
+  }
+
+  if (loadingAuth) {
+    return <FullScreenSpinner />
+  }
+
   return(
     <div className={"app-wrapper"}>
       <NavBar/>
       <div className={"content-wrapper"}>
         <Switch>
-          <Route exact path={"/"} component={Login}/>
-          <Route exact path={"/register"} component={Register}/>
+          <PublicRoute exact component={Login} path={"/"}/>
+          <PublicRoute exact component={Register} path={"/register"}/>
           <PrivateRoute exact component={Dashboard} path={"/dashboard"} />
           <PrivateRoute exact component={Comp} path={"/week"}/>
           <PrivateRoute exact component={Comp} path={"/day/:day"}/>
+          <Route exact component={Logout} path={"/logout"} />
           <Redirect to={"/"}/>
         </Switch>
       </div>

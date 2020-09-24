@@ -1,10 +1,17 @@
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
 import cookie from "js-cookie";
 import history from "./history";
 import _ from "lodash";
 import store, {RootState} from "./store";
 
 type Methods = "GET" | "PUT" | "PATCH" | "POST" | "DELETE";
+
+interface ErrorType {
+  error: boolean
+  message: string
+  type?: string
+  status_code: number
+}
 
 const functions = {
   send: (method: Methods, url: string, data?: object, additionalConfig?: object) => {
@@ -13,7 +20,7 @@ const functions = {
     } = {};
 
     if (cookie.get("token")) {
-      headers.Authorization = `${cookie.get("token")}`
+      headers.Authorization = `Bearer ${cookie.get("token")}`
     }
 
     url = `http://localhost:8080${url}`;
@@ -55,6 +62,15 @@ const functions = {
 
   delete: (url: string, data?: object) => {
     return functions.send("DELETE", url, data)
+  },
+
+  error: (p: AxiosResponse) => {
+    if (p.status >= 300 || p.status < 200) {
+      // Error
+      return p.data as ErrorType
+    }
+
+    return null
   },
 
   pushTo: (url: string) => {

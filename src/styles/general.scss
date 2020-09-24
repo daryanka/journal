@@ -1,3 +1,17 @@
+// Mixins
+@mixin until($px) {
+  @media (max-width: $px) {
+    @content
+  }
+}
+
+@mixin at-least($px) {
+  @media (min-width: $px) {
+    @content
+  }
+}
+
+
 $black: #2b2a2a;
 //#1C1C1C
 $white: #fafafa;
@@ -46,6 +60,14 @@ p {
   margin: 0;
 }
 
+h1 {
+  font-size: 40px;
+}
+
+h2 {
+  font-size: 34px;
+}
+
 body.resizing-el {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -57,4 +79,8 @@ body.resizing-el {
 
 .content-wrapper {
   padding: 10px 20px 0 20px;
+
+  @include until(400px) {
+    padding: 10px 10px 0 10px;
+  }
 }
