@@ -1,12 +1,11 @@
-import axios, {AxiosResponse} from "axios";
+import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from "axios";
 import cookie from "js-cookie";
 import history from "./history";
 import _ from "lodash";
-import store, {RootState} from "./store";
 
 type Methods = "GET" | "PUT" | "PATCH" | "POST" | "DELETE";
 
-interface ErrorType {
+export interface ErrorType {
   error: boolean
   message: string
   type?: string
@@ -14,7 +13,7 @@ interface ErrorType {
 }
 
 const functions = {
-  send: (method: Methods, url: string, data?: object, additionalConfig?: object) => {
+  send: async <T = any>(method: Methods, url: string, data?: object, additionalConfig?: AxiosRequestConfig) => {
     const headers: {
       Authorization?: string
     } = {};
@@ -32,36 +31,32 @@ const functions = {
       headers: headers,
       data: data,
       validateStatus: (status: number) => {
-        return true // Never return error
+        // return status >= 200 && status < 300
+        return true
       }
     });
 
-    return axios(config);
-    // try {
-    //   return await axios(config);
-    // } catch (err) {
-    //   if (err.response.status === 401) {
-    //     cookie.remove("token");
-    //     history.replace("/login")
-    //   }
-    //   return err;
-    // }
+    return await axios.request<T>(config)
   },
 
-  get: (url: string, config?: object) => {
-    return functions.send("GET", url, undefined, config)
+  get: <T = any>(url: string, config?: AxiosRequestConfig) => {
+    return functions.send<T>("GET", url, undefined, config)
   },
 
-  post: (url: string, data: object) => {
-    return functions.send("POST", url, data)
+  post: <T = any>(url: string, data: any, config?: AxiosRequestConfig) => {
+    return functions.send<T>("POST", url, data, config)
   },
 
-  patch: (url: string, data: object) => {
-    return functions.send("PATCH", url, data)
+  patch: <T = any>(url: string, data: object, config?: AxiosRequestConfig) => {
+    return functions.send<T>("PATCH", url, data, config)
   },
 
-  delete: (url: string, data?: object) => {
-    return functions.send("DELETE", url, data)
+  put: <T = any>(url: string, data: object, config?: AxiosRequestConfig) => {
+    return functions.send<T>("PUT", url, data, config)
+  },
+
+  delete: <T = any>(url: string, data?: object, config?: AxiosRequestConfig) => {
+    return functions.send<T>("DELETE", url, data, config)
   },
 
   error: (p: AxiosResponse) => {
@@ -69,7 +64,6 @@ const functions = {
       // Error
       return p.data as ErrorType
     }
-
     return null
   },
 
@@ -77,10 +71,26 @@ const functions = {
     history.push(url)
   },
 
-  isLoggedIn: (): boolean => {
-    const state = store.getState() as RootState;
-    return state.auth.loggedIn
+  timeToMinutesNumber: (time: string): number => {
+    const [hours, minutes] = time.split(":")
+    const minutesFromHours = parseInt(hours) * 60
+    const minutesInt = parseInt(minutes)
+
+    return minutesFromHours + minutesInt
   },
+
+  minutesToTimeString: (minutes: number): string => {
+    let hours = `${Math.floor(minutes / 60)}`
+    let minutesString = `${minutes - Math.floor(minutes / 60) * 60}`
+    if (minutesString === "0") {
+      minutesString = "00"
+    }
+    if (Math.floor(minutes / 60) < 10) {
+      hours = `0${hours}`
+    }
+
+    return `${hours}:${minutesString}`
+  }
 }
 
 export default functions

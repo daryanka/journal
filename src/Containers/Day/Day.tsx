@@ -1,4 +1,9 @@
-import React, {FC, useRef, useState, useCallback} from "react";
+import React, {FC, useRef, useState, useCallback, useMemo} from "react";
+import functions, {ErrorType} from "../../functions";
+import {GetQuery, UpdateQuery} from "./useDay";
+import {RouteComponentProps} from "react-router-dom"
+import {useMutation, useQuery} from "react-query";
+import ContentLoader from "../../Components/ContentLoader";
 
 const times = [
   {t1: "00:00", t2: "00:30"},
@@ -51,55 +56,46 @@ const times = [
   {t1: "23:30", t2: "24:00"},
 ]
 
-const timeToMinutesNumber = (time: string): number => {
-  const [hours, minutes] = time.split(":")
-  const minutesFromHours = parseInt(hours) * 60
-  const minutesInt = parseInt(minutes)
-
-  return minutesFromHours + minutesInt
-}
-
-const minutesToTimeString = (minutes: number): string => {
-  let hours = `${Math.floor(minutes / 60)}`
-  let minutesString = `${minutes - Math.floor(minutes / 60) * 60}`
-  if (minutesString === "0") {
-    minutesString = "00"
-  }
-  if (Math.floor(minutes / 60) < 10) {
-    hours = `0${hours}`
-  }
-
-  return `${hours}:${minutesString}`
-}
-
-interface TimeType {
-  start: string
-  end: string
+export interface DayType {
+  id: number
+  day: string
+  start_time: string
+  end_time: string
   title: string
   description: string
-  category: string
+  tag_id?: number
+  tag_name?: string
 }
 
-const boxHeight = 80;
-
-const Day: FC = () => {
-  const leftBoxRef = useRef<HTMLDivElement>(null);
-  const [state, setState] = useState<TimeType[]>([
-    {
-      description: "description here description here description here description here description here description here description here description here description here",
-      start: "01:30",
-      end: "02:00",
-      title: "Work",
-      category: "Work"
-    },
-    {
-      description: "description here description here description here description here description here description here description here description here description here",
-      start: "03:30",
-      end: "05:00",
-      title: "Work Two",
-      category: "Work"
+const Day: FC<RouteComponentProps<{day: string}>> = (props) => {
+  const [updateSection] = useMutation(UpdateQuery, {
+    onSuccess: (i) => {
+      // Remove from updating
+      removeUpdating(i)
     }
-  ]);
+  })
+  const [updating, setUpdating] = useState<number[]>([])
+  const [boxHeight, setBoxHeight] = useState(30)
+  const data = useQuery<DayType[], ErrorType>(["today", {day: props.match.params.day}], GetQuery, {
+    refetchOnWindowFocus: false,
+    retryDelay: 200,
+    onSuccess: (data) => {
+      setState(data)
+    }
+  })
+
+  const addUpdating = (index: number) => {
+    setUpdating(prev => [...prev, index])
+  }
+
+  const removeUpdating = (index: number) => {
+    setUpdating(prev => {
+      return prev.filter(el => el !== index)
+    })
+  }
+
+  const leftBoxRef = useRef<HTMLDivElement>(null);
+  const [state, setState] = useState<DayType[]>([]);
 
   const calculateLatestAllowedEnd = (stateIndex: number, currentEnd: number): number => {
     const copyState = [...state];
@@ -112,7 +108,7 @@ const Day: FC = () => {
     let latestEnd = 0
     // Loop through remaining state and find the earliest start time that is after the currentEnd
     for (let i = 0; i < copyState.length; i++) {
-      const startNumber = timeToMinutesNumber(copyState[i].start)
+      const startNumber = functions.timeToMinutesNumber(copyState[i].start_time)
       if (startNumber >= currentEnd && startNumber >= latestEnd) {
         latestEnd = startNumber
       }
@@ -136,7 +132,7 @@ const Day: FC = () => {
     let earliestStart = 1440
     // Loop through remaining state and find the earliest start time that is after the currentEnd
     for (let i = 0; i < copyState.length; i++) {
-      const endNumber = timeToMinutesNumber(copyState[i].end)
+      const endNumber = functions.timeToMinutesNumber(copyState[i].end_time)
       if (endNumber <= currentStart && endNumber <= earliestStart) {
         earliestStart = endNumber
       }
@@ -153,13 +149,13 @@ const Day: FC = () => {
     setState(prev => {
       const copyState = [...prev]
       // Get state index
-      const newEndTimeMinutes = timeToMinutesNumber(copyState[stateIndex].end) + (30 * times)
+      const newEndTimeMinutes = functions.timeToMinutesNumber(copyState[stateIndex].end_time) + (30 * times)
       // Check its not the end
-      const latestAllowedEndTime = calculateLatestAllowedEnd(stateIndex, timeToMinutesNumber(copyState[stateIndex].end))
+      const latestAllowedEndTime = calculateLatestAllowedEnd(stateIndex, functions.timeToMinutesNumber(copyState[stateIndex].end_time))
       if (newEndTimeMinutes >= latestAllowedEndTime) {
-        copyState[stateIndex].end = minutesToTimeString(latestAllowedEndTime)
+        copyState[stateIndex].end_time = functions.minutesToTimeString(latestAllowedEndTime)
       } else {
-        copyState[stateIndex].end = minutesToTimeString(newEndTimeMinutes)
+        copyState[stateIndex].end_time = functions.minutesToTimeString(newEndTimeMinutes)
       }
       return copyState
     })
@@ -169,15 +165,15 @@ const Day: FC = () => {
     setState(prev => {
       const copyState = [...prev]
       // Get state index
-      const newStartTimeMinutes = timeToMinutesNumber(copyState[stateIndex].start) + (30 * times)
+      const newStartTimeMinutes = functions.timeToMinutesNumber(copyState[stateIndex].start_time) + (30 * times)
 
       // Make sure start cannot go beyond end
-      if (newStartTimeMinutes >= timeToMinutesNumber(copyState[stateIndex].end)) {
-        copyState[stateIndex].start = minutesToTimeString(timeToMinutesNumber(copyState[stateIndex].end) - 30)
+      if (newStartTimeMinutes >= functions.timeToMinutesNumber(copyState[stateIndex].end_time)) {
+        copyState[stateIndex].start_time = functions.minutesToTimeString(functions.timeToMinutesNumber(copyState[stateIndex].end_time) - 30)
         return copyState
       }
 
-      copyState[stateIndex].start = minutesToTimeString(newStartTimeMinutes)
+      copyState[stateIndex].start_time = functions.minutesToTimeString(newStartTimeMinutes)
       return copyState
     })
   }
@@ -186,15 +182,15 @@ const Day: FC = () => {
     setState(prev => {
       const copyState = [...prev]
       // Get state index
-      const newEndTimeMinutes = timeToMinutesNumber(copyState[stateIndex].end) - (30 * times)
+      const newEndTimeMinutes = functions.timeToMinutesNumber(copyState[stateIndex].end_time) - (30 * times)
 
       // Make sure end is not above start
-      if (newEndTimeMinutes <= timeToMinutesNumber(copyState[stateIndex].start)) {
-        copyState[stateIndex].end = minutesToTimeString(timeToMinutesNumber(copyState[stateIndex].start) + 30)
+      if (newEndTimeMinutes <= functions.timeToMinutesNumber(copyState[stateIndex].start_time)) {
+        copyState[stateIndex].end_time = functions.minutesToTimeString(functions.timeToMinutesNumber(copyState[stateIndex].start_time) + 30)
         return copyState
       }
 
-      copyState[stateIndex].end = minutesToTimeString(newEndTimeMinutes)
+      copyState[stateIndex].end_time = functions.minutesToTimeString(newEndTimeMinutes)
       return copyState
     })
   }
@@ -203,14 +199,25 @@ const Day: FC = () => {
     setState(prev => {
       const copyState = [...prev]
       // Get state index
-      const newStartTimeMinutes = timeToMinutesNumber(copyState[stateIndex].start) - (30 * times)
-      const earliestAllowedStart = calculateEarliestAllowedStart(stateIndex, timeToMinutesNumber(copyState[stateIndex].start))
+      const newStartTimeMinutes = functions.timeToMinutesNumber(copyState[stateIndex].start_time) - (30 * times)
+      const earliestAllowedStart = calculateEarliestAllowedStart(stateIndex, functions.timeToMinutesNumber(copyState[stateIndex].start_time))
       if (newStartTimeMinutes <= earliestAllowedStart) {
-        copyState[stateIndex].start = minutesToTimeString(earliestAllowedStart)
+        copyState[stateIndex].start_time = functions.minutesToTimeString(earliestAllowedStart)
       } else {
-        copyState[stateIndex].start = minutesToTimeString(newStartTimeMinutes)
+        copyState[stateIndex].start_time = functions.minutesToTimeString(newStartTimeMinutes)
       }
       return copyState
+    })
+  }
+
+  const updateState = async (i: number) => {
+    addUpdating(i)
+    setState(prev => {
+      updateSection({
+        data: prev[i],
+        index: i
+      })
+      return prev
     })
   }
 
@@ -219,12 +226,13 @@ const Day: FC = () => {
     if (e.target) {
       const div = e.target as HTMLDivElement
       if (div.className === "bottom-handle" || div.className === "top-handle") {
+        const stateIndex = parseInt(div.dataset.stateIndex as string)
+
         // Mouse Move Handler
         const mouseMoveFunc = (e: MouseEvent) => {
           // Add resizing-el to body className
           document.body.classList.add("resizing-el")
           const distanceBetweenMouseAndBottomHandle = e.y - div!.getBoundingClientRect().top - 9
-          const stateIndex = parseInt(div.dataset.stateIndex as string)
 
           if (distanceBetweenMouseAndBottomHandle > (boxHeight - 5) && !moving) {
             const times = Math.ceil(distanceBetweenMouseAndBottomHandle / boxHeight)
@@ -248,6 +256,7 @@ const Day: FC = () => {
           document.body.classList.remove("resizing-el")
           document.removeEventListener("mousemove", mouseMoveFunc)
           document.removeEventListener("mouseup", removeListener)
+          updateState(stateIndex)
         }
 
         document.addEventListener("mousemove", mouseMoveFunc)
@@ -264,58 +273,60 @@ const Day: FC = () => {
 
   return (
     <div className={"day"}>
-      <div ref={leftBoxRef} className="left">
-        {times.map((day, i) => {
-          return (
-            <div style={{
-              minHeight: `${boxHeight}px`
-            }} key={`${day.t1}-${day.t2}`} className={"day-part"}>
-              <p className="t1">{day.t1}</p>
-              {i === times.length - 1 && <p className={"t2"}>{day.t2}</p>}
-            </div>
-          )
-        })}
-        {state.map((part, i) => {
-          // Calculate top needed using time start
-          const [startHours, startMinutes] = part.start.split(":")
-          let marginCount = parseInt(startHours) * 2
-          if (startMinutes === "30") {
-            marginCount++
-          }
-
-          // Calculate height using distance between time start and time end
-          const [endHours, endMinutes] = part.end.split(":")
-          let distance = (parseInt(endHours) - parseInt(startHours)) * 2
-          if (endMinutes === "30") {
-            distance++
-          }
-          if (startMinutes === "30") {
-            distance--
-          }
-
-          return (
-            <div
-              className={"allocated-part"}
-              id={"testing"}
-              style={{
-                height: `${distance * boxHeight - 10}px`,
-                top: `${marginCount * boxHeight + 5}px`
-              }} key={`${part.title}-${i}`}>
-              <div className={"part-details"}>
-                <div data-state-index={i} className="top-handle"/>
-                <p>{part.title}</p>
-                <p>{part.description}</p>
-                <p>{marginCount}</p>
-                <div data-state-index={i} className="bottom-handle"/>
+      <ContentLoader loading={data.isLoading}>
+        <div ref={leftBoxRef} className="left">
+          {times.map((day, i) => {
+            return (
+              <div style={{
+                minHeight: `${boxHeight}px`
+              }} key={`${day.t1}-${day.t2}`} className={"day-part"}>
+                <p className="t1">{day.t1}</p>
+                {i === times.length - 1 && <p className={"t2"}>{day.t2}</p>}
               </div>
-            </div>
-          )
-        })}
-      </div>
-      <div className="right">
-        <h3>Description:</h3>
-        <textarea></textarea>
-      </div>
+            )
+          })}
+          {state.map((part, i) => {
+            // Calculate top needed using time start
+            const [startHours, startMinutes] = part.start_time.split(":")
+            let marginCount = parseInt(startHours) * 2
+            if (startMinutes === "30") {
+              marginCount++
+            }
+
+            // Calculate height using distance between time start and time end
+            const [endHours, endMinutes] = part.end_time.split(":")
+            let distance = (parseInt(endHours) - parseInt(startHours)) * 2
+            if (endMinutes === "30") {
+              distance++
+            }
+            if (startMinutes === "30") {
+              distance--
+            }
+
+            return (
+              <div
+                className={`allocated-part ${updating.includes(i) ? "updating" : ""}`}
+                id={"testing"}
+                style={{
+                  height: `${distance * boxHeight - 10}px`,
+                  top: `${marginCount * boxHeight + 5}px`
+                }} key={`${part.title}-${i}`}>
+                <div className={"part-details"}>
+                  <div data-state-index={i} className="top-handle"/>
+                  <p>{part.title}</p>
+                  <p>{part.description}</p>
+                  <p>{marginCount}</p>
+                  <div data-state-index={i} className="bottom-handle"/>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+        <div className="right">
+          <h3>Description:</h3>
+          <textarea />
+        </div>
+      </ContentLoader>
     </div>
   )
 }

@@ -39,13 +39,13 @@ const Login: FC = () => {
           validationSchema={loginFormSchema}
           onSubmit={handleSubmit}
         >
-          {({dirty, isValid, isSubmitting}) => {
+          {({dirty, isSubmitting}) => {
             return (
               <Form>
                 <InputField name={"email"} label={"Email*"}/>
                 <InputField type={"password"} name={"password"} label={"Password*"}/>
                 {apiError !== "" && <p className={"error-msg"}>{apiError}</p>}
-                <LoaderButton loading={isSubmitting} disabled={!dirty || !isValid || isSubmitting}>Submit</LoaderButton>
+                <LoaderButton type={"submit"} loading={isSubmitting} disabled={!dirty || isSubmitting}>Submit</LoaderButton>
               </Form>
             )
           }}

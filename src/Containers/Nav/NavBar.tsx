@@ -2,7 +2,7 @@ import React, {FC, useState} from "react";
 import {Link} from "react-router-dom";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
-import moment from "moment";
+import dayjs from "dayjs";
 import functions from "../../functions";
 
 interface linkType {
@@ -12,9 +12,8 @@ interface linkType {
 
 const NavBar: FC = () => {
   const [navOpen, setNavOpen] = useState(false)
-  const today = moment().format("YYYY-MM-DD");
+  const today = dayjs().format("YYYY-MM-DD");
   const isAuth = useSelector((state: RootState) => state.auth.loggedIn)
-
   const publicLinks: linkType[] = [
     {
       to: "/",

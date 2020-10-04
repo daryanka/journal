@@ -13,6 +13,7 @@ import {NEW_USER} from "../reducers/authReducer";
 import FullScreenSpinner from "../Components/FullScreenSpinner";
 import PublicRoute from "../Components/PublicRoute";
 import Logout from "./Logout";
+import Day from "./Day/Day";
 
 const App: FC = () => {
   const [loadingAuth, setLoadingAuth] = useState(false)
@@ -61,7 +62,7 @@ const App: FC = () => {
           <PublicRoute exact component={Register} path={"/register"}/>
           <PrivateRoute exact component={Dashboard} path={"/dashboard"} />
           <PrivateRoute exact component={Comp} path={"/week"}/>
-          <PrivateRoute exact component={Comp} path={"/day/:day"}/>
+          <PrivateRoute exact component={Day} path={"/day/:day"}/>
           <Route exact component={Logout} path={"/logout"} />
           <Redirect to={"/"}/>
         </Switch>

@@ -4,15 +4,26 @@ import Cookie from "js-cookie";
 import store from "../../store";
 import {NEW_USER} from "../../reducers/authReducer";
 
+interface tokenResponse {
+  token: string
+}
+
+interface meResponse {
+  email: string,
+  id: number
+}
+
 type Data = {
   email: string
   password: string
 }
 
 const useLogin = () => async (data: Data) => {
-  const res = await functions.post("/auth/login", data)
+  const res = await functions.post<tokenResponse>("/auth/login", data)
   let err = functions.error(res)
   if (err) {
+    console.log(err)
+    console.log(err)
     return err.message
   }
 
@@ -24,7 +35,7 @@ const useLogin = () => async (data: Data) => {
   })
 
   // Get ME
-  const res2 = await functions.get("/auth/me")
+  const res2 = await functions.get<meResponse>("/auth/me")
   err = functions.error(res2)
   if (err) {
     return err.message
