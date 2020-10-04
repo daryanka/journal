@@ -2,7 +2,7 @@ import React, {FC, useRef, useState, useCallback, useMemo} from "react";
 import functions, {ErrorType} from "../../functions";
 import {GetQuery, UpdateQuery} from "./useDay";
 import {RouteComponentProps} from "react-router-dom"
-import {useMutation, useQuery} from "react-query";
+import {queryCache, useMutation, useQuery} from "react-query";
 import ContentLoader from "../../Components/ContentLoader";
 
 const times = [
@@ -72,6 +72,7 @@ const Day: FC<RouteComponentProps<{day: string}>> = (props) => {
     onSuccess: (i) => {
       // Remove from updating
       removeUpdating(i)
+      queryCache.invalidateQueries(["today", {day: props.match.params.day}])
     }
   })
   const [updating, setUpdating] = useState<number[]>([])

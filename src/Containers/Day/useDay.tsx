@@ -1,6 +1,7 @@
 import React from "react";
 import functions from "../../functions";
 import {DayType} from "./Day";
+import {queryCache} from "react-query";
 
 export const GetQuery = async (key: string, data: {day: string}) => {
   const res = await functions.post(`/entries/day`, {
@@ -21,6 +22,5 @@ export const UpdateQuery = async (data: {data: DayType, index: number}) => {
   if (err) {
     throw err
   }
-
   return data.index
 }
