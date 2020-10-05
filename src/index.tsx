@@ -6,13 +6,16 @@ import store from "./store";
 import App from "./Containers/App";
 import {Router} from "react-router-dom";
 import history from "./history";
+import RedirectContextProvider from "./RedirectContext";
 
 const RootApp: FC = () => {
   return(
     <Provider store={store}>
-      <Router history={history}>
-        <App/>
-      </Router>
+      <RedirectContextProvider>
+        <Router history={history}>
+          <App/>
+        </Router>
+      </RedirectContextProvider>
     </Provider>
   )
 }

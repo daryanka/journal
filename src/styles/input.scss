@@ -26,7 +26,7 @@ select:-webkit-autofill:focus {
     z-index: 1;
   }
 
-  input {
+  input, textarea {
     transition: border 200ms ease;
     position: relative;
     z-index: 3;
@@ -37,6 +37,12 @@ select:-webkit-autofill:focus {
     border: none;
     background: transparent !important;
     border-bottom: 2px solid $black;
+
+    &.text-area {
+      height: 100px;
+      min-height: 60px;
+      resize: vertical;
+    }
 
     &:focus + label, &:not(:placeholder-shown) + label {
       z-index: 4;

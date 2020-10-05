@@ -14,8 +14,10 @@ import FullScreenSpinner from "../Components/FullScreenSpinner";
 import PublicRoute from "../Components/PublicRoute";
 import Logout from "./Logout";
 import Day from "./Day/Day";
+import {useSetRedirectURL} from "../RedirectContext";
 
 const App: FC = () => {
+  const setURL = useSetRedirectURL()
   const [loadingAuth, setLoadingAuth] = useState(false)
   const dispatch = useDispatch()
   React.useEffect(() => {
@@ -45,7 +47,15 @@ const App: FC = () => {
 
       setLoadingAuth(false)
 
-      functions.pushTo("/week")
+      setURL((prev) => {
+        if (prev) {
+          functions.pushTo(prev)
+        } else {
+          functions.pushTo("/week")
+        }
+
+        return null
+      })
     }
   }
 

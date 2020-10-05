@@ -1,9 +1,11 @@
 import React, {FC, useRef, useState, useCallback, useMemo} from "react";
 import functions, {ErrorType} from "../../functions";
-import {GetQuery, UpdateQuery} from "./useDay";
+import {GetDayQuery, UpdateDayQuery} from "./useDay";
 import {RouteComponentProps} from "react-router-dom"
-import {queryCache, useMutation, useQuery} from "react-query";
+import {useMutation, useQuery} from "react-query";
 import ContentLoader from "../../Components/ContentLoader";
+import DayDetails from "./DayDetails";
+import useTags from "../Tags/useTags";
 
 const times = [
   {t1: "00:00", t2: "00:30"},
@@ -65,25 +67,38 @@ export interface DayType {
   description: string
   tag_id?: number
   tag_name?: string
+  hex_color?: string
 }
 
-const Day: FC<RouteComponentProps<{day: string}>> = (props) => {
-  const [updateSection] = useMutation(UpdateQuery, {
+const Day: FC<RouteComponentProps<{ day: string }>> = (props) => {
+  const tagData = useTags()
+  const [activeDay, setActiveDay] = useState<null | DayType>(null)
+  const leftBoxRef = useRef<HTMLDivElement>(null);
+  const [state, _setState] = useState<DayType[]>([]);
+  const stateRef = useRef(state)
+  const setState = (data: DayType[]) => {
+    stateRef.current = data
+    return _setState(data)
+  }
+  const [updateSection] = useMutation(UpdateDayQuery, {
     onSuccess: (i) => {
       // Remove from updating
       removeUpdating(i)
-      queryCache.invalidateQueries(["today", {day: props.match.params.day}])
-    }
+    },
   })
   const [updating, setUpdating] = useState<number[]>([])
   const [boxHeight, setBoxHeight] = useState(30)
-  const data = useQuery<DayType[], ErrorType>(["today", {day: props.match.params.day}], GetQuery, {
+  const data = useQuery<DayType[], ErrorType>(["today", {day: props.match.params.day}], GetDayQuery, {
     refetchOnWindowFocus: false,
     retryDelay: 200,
     onSuccess: (data) => {
       setState(data)
     }
   })
+
+  React.useEffect(() => {
+    setActiveDay(null)
+  }, [props.match.params.day])
 
   const addUpdating = (index: number) => {
     setUpdating(prev => [...prev, index])
@@ -95,11 +110,8 @@ const Day: FC<RouteComponentProps<{day: string}>> = (props) => {
     })
   }
 
-  const leftBoxRef = useRef<HTMLDivElement>(null);
-  const [state, setState] = useState<DayType[]>([]);
-
   const calculateLatestAllowedEnd = (stateIndex: number, currentEnd: number): number => {
-    const copyState = [...state];
+    const copyState = [...stateRef.current];
     // Remove state index
     copyState.splice(stateIndex, 1)
     if (copyState.length === 0) {
@@ -123,7 +135,7 @@ const Day: FC<RouteComponentProps<{day: string}>> = (props) => {
   }
 
   const calculateEarliestAllowedStart = (stateIndex: number, currentStart: number): number => {
-    const copyState = [...state];
+    const copyState = [...stateRef.current];
     // Remove state index
     copyState.splice(stateIndex, 1)
     if (copyState.length === 0) {
@@ -147,7 +159,7 @@ const Day: FC<RouteComponentProps<{day: string}>> = (props) => {
   }
 
   const MoveEndDown = (stateIndex: number, times = 1) => {
-    setState(prev => {
+    _setState(prev => {
       const copyState = [...prev]
       // Get state index
       const newEndTimeMinutes = functions.timeToMinutesNumber(copyState[stateIndex].end_time) + (30 * times)
@@ -163,7 +175,7 @@ const Day: FC<RouteComponentProps<{day: string}>> = (props) => {
   }
 
   const MoveStartDown = (stateIndex: number, times = 1) => {
-    setState(prev => {
+    _setState(prev => {
       const copyState = [...prev]
       // Get state index
       const newStartTimeMinutes = functions.timeToMinutesNumber(copyState[stateIndex].start_time) + (30 * times)
@@ -180,7 +192,7 @@ const Day: FC<RouteComponentProps<{day: string}>> = (props) => {
   }
 
   const MoveEndUp = (stateIndex: number, times = 1) => {
-    setState(prev => {
+    _setState(prev => {
       const copyState = [...prev]
       // Get state index
       const newEndTimeMinutes = functions.timeToMinutesNumber(copyState[stateIndex].end_time) - (30 * times)
@@ -197,7 +209,7 @@ const Day: FC<RouteComponentProps<{day: string}>> = (props) => {
   }
 
   const MoveStartUp = (stateIndex: number, times = 1) => {
-    setState(prev => {
+    _setState(prev => {
       const copyState = [...prev]
       // Get state index
       const newStartTimeMinutes = functions.timeToMinutesNumber(copyState[stateIndex].start_time) - (30 * times)
@@ -213,7 +225,7 @@ const Day: FC<RouteComponentProps<{day: string}>> = (props) => {
 
   const updateState = async (i: number) => {
     addUpdating(i)
-    setState(prev => {
+    _setState(prev => {
       updateSection({
         data: prev[i],
         index: i
@@ -266,6 +278,17 @@ const Day: FC<RouteComponentProps<{day: string}>> = (props) => {
     }
   }, [])
 
+  const handleNewAllocationPart = (t1: string, t2: string) => {
+    console.log(`t1: ${t1}, t2: ${t2}`)
+  }
+
+  const handleUpdateDay = (day: DayType) => {
+    const copyState = [...state]
+    const i = copyState.findIndex(el => el.id === day.id)
+    copyState[i] = day
+    setState(copyState)
+  }
+
   React.useEffect(() => {
     document.addEventListener("mousedown", handleMouseDown)
 
@@ -274,13 +297,16 @@ const Day: FC<RouteComponentProps<{day: string}>> = (props) => {
 
   return (
     <div className={"day"}>
-      <ContentLoader loading={data.isLoading}>
+      <ContentLoader loading={data.isLoading || data.isFetching || tagData.isLoading}>
         <div ref={leftBoxRef} className="left">
           {times.map((day, i) => {
             return (
-              <div style={{
-                minHeight: `${boxHeight}px`
-              }} key={`${day.t1}-${day.t2}`} className={"day-part"}>
+              <div
+                style={{minHeight: `${boxHeight}px`}}
+                key={`${day.t1}-${day.t2}`}
+                className={"day-part"}
+                onClick={() => handleNewAllocationPart(day.t1, day.t2)}
+              >
                 <p className="t1">{day.t1}</p>
                 {i === times.length - 1 && <p className={"t2"}>{day.t2}</p>}
               </div>
@@ -304,29 +330,36 @@ const Day: FC<RouteComponentProps<{day: string}>> = (props) => {
               distance--
             }
 
+            const isUpdating = updating.includes(i)
+
             return (
               <div
-                className={`allocated-part ${updating.includes(i) ? "updating" : ""}`}
+                className={`allocated-part ${isUpdating ? "updating" : ""}`}
                 id={"testing"}
                 style={{
                   height: `${distance * boxHeight - 10}px`,
                   top: `${marginCount * boxHeight + 5}px`
                 }} key={`${part.title}-${i}`}>
-                <div className={"part-details"}>
-                  <div data-state-index={i} className="top-handle"/>
+                <div onClick={() => setActiveDay(part)} className={"part-details"}>
+                  {isUpdating && (
+                    <div className="loader">
+                      <div className="spinner">
+                        <div className="bounce1"/>
+                        <div className="bounce2"/>
+                        <div className="bounce3"/>
+                      </div>
+                    </div>
+                  )}
+                  {!isUpdating && <div data-state-index={i} className="top-handle"/>}
                   <p>{part.title}</p>
                   <p>{part.description}</p>
-                  <p>{marginCount}</p>
-                  <div data-state-index={i} className="bottom-handle"/>
+                  {!isUpdating && <div data-state-index={i} className="bottom-handle"/>}
                 </div>
               </div>
             )
           })}
         </div>
-        <div className="right">
-          <h3>Description:</h3>
-          <textarea />
-        </div>
+        <DayDetails day={activeDay} handleUpdateDay={handleUpdateDay} />
       </ContentLoader>
     </div>
   )
