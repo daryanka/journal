@@ -15,6 +15,7 @@ import PublicRoute from "../Components/PublicRoute";
 import Logout from "./Logout";
 import Day from "./Day/Day";
 import {useSetRedirectURL} from "../RedirectContext";
+import Tags from "./Tags/Tags";
 
 const App: FC = () => {
   const setURL = useSetRedirectURL()
@@ -73,6 +74,7 @@ const App: FC = () => {
           <PrivateRoute exact component={Dashboard} path={"/dashboard"} />
           <PrivateRoute exact component={Comp} path={"/week"}/>
           <PrivateRoute exact component={Day} path={"/day/:day"}/>
+          <PrivateRoute exact component={Tags} path={"/tags"}/>
           <Route exact component={Logout} path={"/logout"} />
           <Redirect to={"/"}/>
         </Switch>

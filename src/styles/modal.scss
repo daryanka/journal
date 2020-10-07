@@ -1,0 +1,30 @@
+.modal-wrapper {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background-color: rgba(0,0,0, 0.3);
+    z-index: 100;
+  }
+
+  .modal-content {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    min-height: 60%;
+    z-index: 101;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    padding: 30px;
+  }
+}

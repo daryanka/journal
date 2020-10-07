@@ -31,6 +31,10 @@ const NavBar: FC = () => {
       title: "Today"
     },
     {
+      to: "/tags",
+      title: "Tags"
+    },
+    {
       to: "/logout",
       title: "Logout"
     }
