@@ -10,9 +10,9 @@ const LoaderButton: FC<loaderButtonProp> = ({loading, children,...props}) => {
     <div className={`button-wrapper ${loading ? "loading" : ""}`}>
       <button {...props}>
         <span className={`spinner`}>
-          <span className="bounce1"></span>
-          <span className="bounce2"></span>
-          <span className="bounce3"></span>
+          <span className="bounce1" />
+          <span className="bounce2" />
+          <span className="bounce3" />
         </span>
         <span className={"child"}>{children}</span>
       </button>

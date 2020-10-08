@@ -13,7 +13,7 @@ export interface ErrorType {
 }
 
 const functions = {
-  send: async <T = any>(method: Methods, url: string, data?: object, additionalConfig?: AxiosRequestConfig) => {
+  send: async <T = any>(method: Methods, url: string, data?: any, additionalConfig?: AxiosRequestConfig) => {
     const headers: {
       Authorization?: string
     } = {};
@@ -62,6 +62,11 @@ const functions = {
   error: (p: AxiosResponse) => {
     if (p.status >= 300 || p.status < 200) {
       // Error
+      if (p.status === 401) {
+        // Logout
+        functions.pushTo("/logout")
+      }
+
       return p.data as ErrorType
     }
     return null

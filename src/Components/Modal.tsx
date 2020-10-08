@@ -6,7 +6,16 @@ export interface modalOptionsI {
   close: () => void
 }
 
-const Modal: ForwardRefExoticComponent<any> = forwardRef((props, ref) => {
+interface modalProps {
+  className?: string
+  children: React.ReactNode
+  ref: any
+}
+
+const Modal: ForwardRefExoticComponent<modalProps> = forwardRef((props, ref) => {
+  const {
+    className = ""
+  } = props
   const [display, setDisplay] = React.useState(false);
 
   useImperativeHandle(ref, () => {
@@ -25,7 +34,7 @@ const Modal: ForwardRefExoticComponent<any> = forwardRef((props, ref) => {
   };
 
   const content = (
-    <div className={"modal-wrapper"}>
+    <div className={`modal-wrapper ${className}`}>
       <div onClick={hide} className={"modal-backdrop"} />
       <div className={"modal-content"}>
         {props.children}

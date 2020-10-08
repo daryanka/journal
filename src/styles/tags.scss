@@ -33,3 +33,24 @@
     }
   }
 }
+
+.edit-tag-modal {
+  .modal-content {
+    width: 400px !important;
+    max-height: 80% !important;
+  }
+
+  .color {
+    margin-bottom: 22px;
+    .color-box {
+      height: 20px;
+      width: 100%;
+      margin-bottom: 22px;
+    }
+
+    .sketch-picker {
+      width: calc(100% - 20px) !important;
+      margin-left: auto;
+    }
+  }
+}
