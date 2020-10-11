@@ -2,7 +2,7 @@ import React, {FC, useRef, useState, useCallback} from "react";
 import functions, {ErrorType} from "../../functions";
 import {GetDayQuery, UpdateDayQuery} from "./useDay";
 import {RouteComponentProps} from "react-router-dom"
-import {queryCache, useMutation, useQuery} from "react-query";
+import {useMutation, useQuery} from "react-query";
 import ContentLoader from "../../Components/ContentLoader";
 import DayDetails from "./DayDetails";
 import useTags from "../Tags/useTags";
@@ -276,7 +276,6 @@ const Day: FC<RouteComponentProps<{ day: string }>> = (props) => {
             }, 50)
           }
         }
-        //
 
         const removeListener = () => {
           document.body.classList.remove("resizing-el")
@@ -384,7 +383,7 @@ const Day: FC<RouteComponentProps<{ day: string }>> = (props) => {
                 id={"testing"}
                 style={{
                   height: `${distance * boxHeight - 10}px`,
-                  top: `${marginCount * boxHeight + 5}px`,
+                  top: `${marginCount * boxHeight + 5 + 20}px`,
                   backgroundColor: color.css()
                 }} key={`${part.title}-${i}`}>
                 <div onClick={() => handleSetActiveDay(part)} className={"part-details"}>

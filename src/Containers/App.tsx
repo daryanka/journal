@@ -16,6 +16,7 @@ import Logout from "./Logout";
 import Day from "./Day/Day";
 import {useSetRedirectURL} from "../RedirectContext";
 import Tags from "./Tags/Tags";
+import Week from "./Week/Week";
 
 const App: FC = () => {
   const setURL = useSetRedirectURL()
@@ -72,7 +73,7 @@ const App: FC = () => {
           <PublicRoute exact component={Login} path={"/"}/>
           <PublicRoute exact component={Register} path={"/register"}/>
           <PrivateRoute exact component={Dashboard} path={"/dashboard"} />
-          <PrivateRoute exact component={Comp} path={"/week"}/>
+          <PrivateRoute exact component={Week} path={"/week"}/>
           <PrivateRoute exact component={Day} path={"/day/:day"}/>
           <PrivateRoute exact component={Tags} path={"/tags"}/>
           <Route exact component={Logout} path={"/logout"} />
