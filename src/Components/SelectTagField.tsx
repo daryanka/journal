@@ -63,13 +63,25 @@ const SelectTagField: FC<CustomSelectProps> = ({placeholder, options, isMulti = 
 
   const getValue = () => {
     if (options) {
-      return isMulti
-        ? options.filter(option => field.value.indexOf(option.value) >= 0)
-        : options.find(option => option.value === field.value);
+      if (isMulti) {
+        const r = options.filter(option => field.value.indexOf(option.value) >= 0)
+        if (r) {
+          return r
+        }
+      } else {
+        const r = options.find(option => option.value === field.value);
+        if (r) {
+          return r
+        }
+      }
+
+      return null
     } else {
       return isMulti ? [] : ("" as any);
     }
   };
+
+  console.log(getValue())
 
   const onChange = (option: ValueType<Option | Option[]>) => {
     if (!option) {

@@ -2,7 +2,7 @@ import React, {FC, useRef, useState, useCallback} from "react";
 import functions, {ErrorType} from "../../functions";
 import {GetDayQuery, UpdateDayQuery} from "./useDay";
 import {RouteComponentProps} from "react-router-dom"
-import {useMutation, useQuery} from "react-query";
+import {queryCache, useMutation, useQuery} from "react-query";
 import ContentLoader from "../../Components/ContentLoader";
 import DayDetails from "./DayDetails";
 import useTags from "../Tags/useTags";
@@ -10,6 +10,7 @@ import DayPart from "./DayPart";
 import dayjs from "dayjs";
 import Modal, {modalOptionsI} from "../../Components/Modal";
 import LoaderButton from "../../Components/LoaderButton";
+import chroma from "chroma-js";
 
 const times = [
   {t1: "00:00", t2: "00:30"},
@@ -375,13 +376,16 @@ const Day: FC<RouteComponentProps<{ day: string }>> = (props) => {
 
             const isUpdating = updating.includes(i)
 
+            const color = chroma(part.hex_color ? part.hex_color : "#565656");
+            const textColor = chroma.contrast(color, 'white') > 2 ? 'white' : '#2b2a2a'
             return (
               <div
                 className={`allocated-part ${isUpdating ? "updating" : ""}`}
                 id={"testing"}
                 style={{
                   height: `${distance * boxHeight - 10}px`,
-                  top: `${marginCount * boxHeight + 5}px`
+                  top: `${marginCount * boxHeight + 5}px`,
+                  backgroundColor: color.css()
                 }} key={`${part.title}-${i}`}>
                 <div onClick={() => handleSetActiveDay(part)} className={"part-details"}>
                   {isUpdating && (
@@ -394,8 +398,8 @@ const Day: FC<RouteComponentProps<{ day: string }>> = (props) => {
                     </div>
                   )}
                   {!isUpdating && <div data-state-index={i} className="top-handle"/>}
-                  <p>{part.title === "" ? "New Entry" : part.title}</p>
-                  <p>{part.description}</p>
+                  <p style={{color: textColor}}>{part.title === "" ? "New Entry" : part.title}</p>
+                  <p style={{color: textColor}}>{part.description}</p>
                   {!isUpdating && <div data-state-index={i} className="bottom-handle"/>}
                 </div>
               </div>
