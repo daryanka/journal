@@ -38,6 +38,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "@types/chroma-js": "^2.1.0",
     "@types/js-cookie": "^2.2.6",
     "@types/lodash": "^4.14.161",
     "@types/react-color": "^3.0.4",
@@ -47,6 +48,7 @@
     "@types/react-select": "^3.0.21",
     "@types/yup": "^0.29.7",
     "axios": "^0.20.0",
+    "chroma-js": "^2.1.0",
     "dayjs": "^1.8.36",
     "formik": "^2.1.5",
     "history": "4.10.1",

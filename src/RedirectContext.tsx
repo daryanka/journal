@@ -9,7 +9,6 @@ const RedirectContext = createContext<any>(null)
 
 const RedirectContextProvider: FC = (props) => {
   const [routerRedirect, setRouterRedirect] = useState<null | string>(null)
-  console.log("redirect route", routerRedirect)
 
   return(
     <RedirectContext.Provider value={{routerRedirect, setRouterRedirect}}>

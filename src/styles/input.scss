@@ -74,3 +74,28 @@ select:-webkit-autofill:focus {
   color: $error;
   font-style: italic;
 }
+
+.select-wrapper {
+  margin: 22px 0;
+
+  .sel__control {
+    border: none;
+    border-bottom: 2px solid #2b2a2a;
+    border-radius: 0;
+    box-shadow: none;
+    background-color: transparent;
+    &:hover {
+      cursor: pointer;
+    }
+
+    &:hover {
+      border: none;
+      border-bottom: 2px solid #2b2a2a;
+      outline: none;
+    }
+
+    .sel__indicator-separator {
+     display: none;
+    }
+  }
+}

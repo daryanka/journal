@@ -85,7 +85,6 @@ const App: FC = () => {
 }
 
 const Comp = () => {
-  console.log("inside comp")
   return (
     <h1>Private</h1>
   )

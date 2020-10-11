@@ -22,8 +22,6 @@ const useLogin = () => async (data: Data) => {
   const res = await functions.post<tokenResponse>("/auth/login", data)
   let err = functions.error(res)
   if (err) {
-    console.log(err)
-    console.log(err)
     return err.message
   }
 

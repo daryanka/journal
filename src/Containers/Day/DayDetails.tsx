@@ -1,4 +1,4 @@
-import React, {FC, useState} from "react";
+import React, {FC, useMemo, useState} from "react";
 import {DayType} from "./Day";
 import {Form, Formik} from "formik";
 import * as Yup from "yup";
@@ -8,6 +8,7 @@ import LoaderButton from "../../Components/LoaderButton";
 import {useMutation} from "react-query";
 import {UpdateDayDetails} from "./useDay";
 import useTags from "../Tags/useTags";
+import SelectTagField from "../../Components/SelectTagField";
 
 interface propsI {
   day: DayType | null | undefined
@@ -16,17 +17,23 @@ interface propsI {
 
 const validationSchema = Yup.object().shape({
   title: Yup.string().required().max(255),
-  description: Yup.string()
+  description: Yup.string(),
+  tag_id: Yup.string().label("Tag")
 })
 
 interface formTypes {
   title: string
   description?: string
+  tag_id?: string
 }
 
 const DayDetails: FC<propsI> = (props) => {
-  const [tagList, setTagList] = useState()
-  const tagData = useTags()
+  const tagInfo = useTags()
+  const selectOptions = useMemo(() => tagInfo.data ? tagInfo.data.map(el => ({
+    value: `${el.tag_id}`,
+    label: el.tag_name,
+    color: el.hex_color
+  })) : [] ,[tagInfo.data])
   const [mutate] = useMutation(UpdateDayDetails, {
     onSuccess: data => {
       props.handleUpdateDay(data.data)
@@ -36,7 +43,8 @@ const DayDetails: FC<propsI> = (props) => {
     const data = {
       ...props.day as DayType,
       title: values.title,
-      description: values.description ? values.description : ""
+      description: values.description ? values.description : "",
+      tag_id: values.tag_id ? parseInt(values.tag_id) : undefined
     }
     await mutate({
       data: data
@@ -47,14 +55,13 @@ const DayDetails: FC<propsI> = (props) => {
     return null
   }
 
-  console.log(tagData.data)
-
   return (
     <div className="right">
       <Formik
         initialValues={{
           title: props.day?.title,
           description: props.day?.description,
+          tag_id: props.day?.tag_id ? `${props.day.tag_id}` : undefined
         }}
         onSubmit={handleSubmit}
         validationSchema={validationSchema}
@@ -64,6 +71,12 @@ const DayDetails: FC<propsI> = (props) => {
            <Form>
              <InputField name={"title"} label={"Title"} />
              <TextField name={"description"} label={"Description"} />
+             <SelectTagField
+               placeholder={"Tag..."}
+               name={"tag_id"}
+               options={selectOptions}
+               clearable
+             />
              <div className="btn-r">
                <LoaderButton disabled={isSubmitting} loading={isSubmitting}>Save</LoaderButton>
              </div>
