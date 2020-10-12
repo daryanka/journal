@@ -1,0 +1,36 @@
+.week-wrapper {
+  .top {
+
+  }
+
+  .week-days-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    grid-gap: 20px;
+
+    .week-day {
+      padding: 10px;
+      border-radius: 7px;
+      box-shadow: 0 0 10px rgba($black, 0.3);
+      h2 {
+        text-align: center;
+      }
+
+      .day-view {
+        padding: 10px;
+        margin-top: 20px;
+        .t-part {
+          height: 10px;
+        }
+
+        .t-part:nth-child(odd) {
+          background-color: #ababab;
+        }
+
+        .t-part:nth-child(even) {
+          background-color: #ececec;
+        }
+      }
+    }
+  }
+}

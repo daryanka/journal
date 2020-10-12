@@ -1,19 +1,28 @@
-import React, {FC, useState} from "react";
+import React, {FC, useMemo, useState} from "react";
 import dayjs, {Dayjs} from "dayjs";
 import {useQuery} from "react-query";
 import functions from "../../functions";
 import {DayType} from "../Day/Day";
+import ContentLoader from "../../Components/ContentLoader";
+import _ from "lodash";
+import WeekDayView from "./WeekDayView";
+import useTags, {TagType} from "../Tags/useTags";
 
 interface stateType {
   start_day: Dayjs
   end_day: Dayjs
 }
 
+export type WeekDays = "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday"
+
 const Week: FC = (props) => {
+  const tagsInfo = useTags()
   const [week, setWeek] = useState<stateType>({
-    start_day: dayjs().startOf("week"),
-    end_day: dayjs().endOf("week"),
+    start_day: dayjs().startOf("week").add(1, "day"),
+    end_day: dayjs().endOf("week").add(1, "day"),
   })
+  const prettyStart = week.start_day.format("YYYY MMMM D")
+  const prettyEnd = week.end_day.format("YYYY MMMM D")
 
   const weekInfo = useQuery(["week", {
     start: week.start_day.format("YYYY-MM-DD"),
@@ -28,7 +37,22 @@ const Week: FC = (props) => {
       throw err
     }
 
-    return res.data
+    const days: {[day in WeekDays]: DayType[] } = {
+      Monday: [],
+      Tuesday: [],
+      Wednesday: [],
+      Thursday: [],
+      Friday: [],
+      Saturday: [],
+      Sunday: [],
+    }
+
+    for (let i = 0; i < res.data.length; i++) {
+      const d = dayjs(res.data[i].day).format("dddd") as WeekDays
+      days[d].push(res.data[i])
+    }
+
+    return days
   }, {
     refetchOnWindowFocus: false
   })
@@ -47,14 +71,22 @@ const Week: FC = (props) => {
     }))
   }
 
-  console.log("week data", weekInfo.data)
-
   return (
-    <div>
-      <p>Start: {week.start_day.format("YYYY-MM-DD dddd")}</p>
-      <p>End: {week.end_day.format("YYYY-MM-DD dddd")}</p>
-      <button onClick={nextWeek}>next week</button>
-      <button onClick={lastWeek}>last week</button>
+    <div className={"week-wrapper"}>
+      <ContentLoader loading={weekInfo.isLoading || tagsInfo.isLoading}>
+        <div className="top">
+          <h1>{prettyStart} - {prettyEnd}</h1>
+          <button onClick={nextWeek}>next week</button>
+          <button onClick={lastWeek}>last week</button>
+        </div>
+        <div className={"week-days-wrapper"}>
+          {weekInfo.data && _.map(weekInfo.data, (el, key) => {
+            return(
+              <WeekDayView tags={tagsInfo.data as TagType[]} data={el} key={`weekday-${key}`} day={key as WeekDays} />
+            )
+          })}
+        </div>
+      </ContentLoader>
     </div>
   )
 }

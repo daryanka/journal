@@ -12,7 +12,9 @@ import Modal, {modalOptionsI} from "../../Components/Modal";
 import LoaderButton from "../../Components/LoaderButton";
 import chroma from "chroma-js";
 
-const times = [
+export const NoTagColor = "#565656"
+
+export const times = [
   {t1: "00:00", t2: "00:30"},
   {t1: "00:30", t2: "01:00"},
   {t1: "01:00", t2: "01:30"},
@@ -375,7 +377,7 @@ const Day: FC<RouteComponentProps<{ day: string }>> = (props) => {
 
             const isUpdating = updating.includes(i)
 
-            const color = chroma(part.hex_color ? part.hex_color : "#565656");
+            const color = chroma(part.hex_color ? part.hex_color : NoTagColor);
             const textColor = chroma.contrast(color, 'white') > 2 ? 'white' : '#2b2a2a'
             return (
               <div
