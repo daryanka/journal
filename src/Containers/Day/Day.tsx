@@ -307,7 +307,6 @@ const Day: FC<RouteComponentProps<{ day: string }>> = (props) => {
       title: ""
     }
     setActiveDay(data)
-    console.log("here")
     setState([...state, data])
   }
 
