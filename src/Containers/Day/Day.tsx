@@ -298,25 +298,31 @@ const Day: FC<RouteComponentProps<{ day: string }>> = (props) => {
       return
     }
     setNewSaved(false)
-    const dayTime = dayjs().format("YYYY-MM-DD")
     const data = {
       id: 0,
       end_time: t2,
       start_time: t1,
-      day: dayTime,
+      day:  props.match.params.day,
       description: "",
       title: ""
     }
     setActiveDay(data)
+    console.log("here")
     setState([...state, data])
   }
 
-  const handleUpdateDay = (day: DayType) => {
+  const handleUpdateDay = (day: DayType, type: string) => {
     setNewSaved(true)
     const copyState = [...state]
-    const i = copyState.findIndex(el => el.id === day.id)
-    copyState[i] = day
+    if (type === "UPDATE") {
+      const i = copyState.findIndex(el => el.id === day.id)
+      copyState[i] = day
+    } else {
+      const i = copyState.findIndex(el => el.id === 0)
+      copyState[i] = day
+    }
     setState(copyState)
+    setActiveDay(day)
   }
 
   const handleDiscardNew = () => {
@@ -338,6 +344,8 @@ const Day: FC<RouteComponentProps<{ day: string }>> = (props) => {
     document.addEventListener("mousedown", handleMouseDown)
     return () => document.removeEventListener("mousedown", handleMouseDown)
   }, [])
+
+  console.log("active day", activeDay)
 
   return (
     <div className={"day"}>

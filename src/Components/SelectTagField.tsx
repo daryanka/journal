@@ -81,8 +81,6 @@ const SelectTagField: FC<CustomSelectProps> = ({placeholder, options, isMulti = 
     }
   };
 
-  console.log(getValue())
-
   const onChange = (option: ValueType<Option | Option[]>) => {
     if (!option) {
       helpers.setValue("")

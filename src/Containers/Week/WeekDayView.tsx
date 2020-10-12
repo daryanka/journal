@@ -14,13 +14,13 @@ interface propsI {
 
 const WeekDayView: FC<propsI> = (props) => {
   const pieData = useMemo(() => {
-    const returnData: {data: number[], labels: string[], colors: string[]} = {
+    const returnData: { data: number[], labels: string[], colors: string[] } = {
       data: [],
       labels: [],
       colors: []
     }
 
-    const groupedDataByTagID: {[key: string]: number} = {}
+    const groupedDataByTagID: { [key: string]: number } = {}
     let total = 0
 
     for (let i = 0; i < props.data.length; i++) {
@@ -38,7 +38,6 @@ const WeekDayView: FC<propsI> = (props) => {
 
     _.forEach(groupedDataByTagID, (time, key) => {
       const percent = Number(((time / total) * 100).toFixed(2))
-      console.log(percent)
       if (key === "no-tag") {
         returnData.data.unshift(percent)
         returnData.labels.unshift("Not Tagged")
@@ -54,28 +53,45 @@ const WeekDayView: FC<propsI> = (props) => {
     return returnData
   }, [props.data])
 
-  console.log(pieData)
   return (
     <div className={"week-day"}>
       <h2>{props.day}</h2>
 
       <div className="day-view">
         {times.map(el => {
-          return(
-            <div key={`t1-${el.t1}`} className={"t-part"} />
+          return (
+            <div key={`t1-${el.t1}`} className={"t-part"}/>
           )
         })}
       </div>
       <div className="pie-wrapper">
-        <Pie data={{
-          datasets: [{
-            data: pieData.data,
-            backgroundColor: pieData.colors
-          }],
+        {pieData.data.length > 0 && (
+          <Pie
+            data={{
+              datasets: [{
+                data: pieData.data,
+                backgroundColor: pieData.colors
+              }],
 
-          labels: pieData.labels,
-        }}
-        />
+              labels: pieData.labels,
+            }}
+            options={{
+              maintainAspectRatio: false,
+              legend: {
+                display: false
+              },
+              tooltips: {
+                displayColors: false,
+                callbacks: {
+                  label: (tooltipItem,data) => {
+                    const val = data!.datasets![0].data![tooltipItem.index as number]
+                    return `${data!.labels![tooltipItem.index as number]} ${val}%`
+                  }
+                }
+              }
+            }}
+          />
+        )}
       </div>
     </div>
   )

@@ -31,13 +31,13 @@ export const UpdateDayDetails = async (data: {data: DayType}) => {
     if (err) {
       throw err
     }
-    return {...data, id: res.data.id}
+    return {...data.data, id: res.data.id, type: "CREATE"}
   } else {
     const res = await functions.put("/entries/", data.data)
     const err = functions.error(res)
     if (err) {
       throw err
     }
-    return data
+    return {...data.data, type: "UPDATE"}
   }
 }

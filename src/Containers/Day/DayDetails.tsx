@@ -12,7 +12,7 @@ import SelectTagField from "../../Components/SelectTagField";
 
 interface propsI {
   day: DayType | null | undefined
-  handleUpdateDay: (d: DayType) => void
+  handleUpdateDay: (d: DayType, type: string) => void
 }
 
 const validationSchema = Yup.object().shape({
@@ -36,13 +36,14 @@ const DayDetails: FC<propsI> = (props) => {
   })) : [] ,[tagInfo.data])
   const [mutate] = useMutation(UpdateDayDetails, {
     onSuccess: data => {
-      if (data.data.tag_id) {
-        const t = tagInfo.data!.find(el => el.tag_id === data.data.tag_id)
-        data.data.hex_color = t!.hex_color
+      if (data.tag_id) {
+        const t = tagInfo.data!.find(el => el.tag_id === data.tag_id)
+        data.hex_color = t!.hex_color
       } else {
-        data.data.hex_color = undefined
+        data.hex_color = undefined
       }
-      props.handleUpdateDay(data.data)
+      console.log("updated/saved data", data)
+      props.handleUpdateDay(data, data.type)
     }
   })
   const handleSubmit = async (values: formTypes) => {
