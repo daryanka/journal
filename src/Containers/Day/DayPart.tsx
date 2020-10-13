@@ -24,23 +24,14 @@ const DayPart: FC<propsI> = ({days, ...props}) => {
       const endMins = functions.timeToMinutesNumber(curr.end_time)
       const num1 = functions.timeToMinutesNumber(props.t1)
       const num2 = functions.timeToMinutesNumber(props.t2)
-      if (isBetween(num1, startMins, endMins) || isBetween(num2, startMins, endMins)) {
+
+      if (isBetween(num1, startMins, endMins) || isBetween(num2, startMins, endMins) || props.t1 === curr.start_time) {
         return true
       }
     }
-
     return false
   }, [days])
 
-  const handleMouse = (t: string) => {
-    if (inUse) {
-      return
-    } else if (t === "enter") {
-      setHovering(true)
-    } else if (t === "leave") {
-      setHovering(false)
-    }
-  }
 
   const handleClick = () => {
     if (!inUse) {
@@ -58,7 +49,7 @@ const DayPart: FC<propsI> = ({days, ...props}) => {
       onClick={() => handleClick()}
     >
       {hovering && <BiPlusMedical />}
-      <p className="t1">{props.t1}</p>
+      <p className="t1">{functions.timeToMinutesNumber(props.t1)}</p>
       {props.last && <p className={"t2"}>{props.t2}</p>}
     </div>
   )

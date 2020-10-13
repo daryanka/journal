@@ -344,8 +344,6 @@ const Day: FC<RouteComponentProps<{ day: string }>> = (props) => {
     return () => document.removeEventListener("mousedown", handleMouseDown)
   }, [])
 
-  console.log("active day", activeDay)
-
   return (
     <div className={"day"}>
       <Modal ref={modalRef}>

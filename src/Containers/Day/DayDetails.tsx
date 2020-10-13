@@ -42,7 +42,6 @@ const DayDetails: FC<propsI> = (props) => {
       } else {
         data.hex_color = undefined
       }
-      console.log("updated/saved data", data)
       props.handleUpdateDay(data, data.type)
     }
   })
