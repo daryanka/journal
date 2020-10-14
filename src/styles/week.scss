@@ -19,6 +19,8 @@
       .day-view {
         padding: 10px;
         margin-top: 20px;
+        position: relative;
+
         .t-part {
           height: 10px;
         }
@@ -29,6 +31,50 @@
 
         .t-part:nth-child(even) {
           background-color: #ececec;
+        }
+
+        .week-day-allocation {
+          border-radius: 7px;
+          box-shadow: 0 0 5px rgba($black, 0.3);
+          position: absolute;
+          left: 12px;
+          right: 12px;
+
+          .tooltip {
+            padding: 2px 5px;
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            //height: 20px;
+            //width: 50px;
+            background-color: $black;
+
+            p {
+              color: $white;
+              font-size: 12px;
+            }
+
+            .down-triangle {
+              position: absolute;
+              bottom: -5px;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 0;
+              height: 0;
+              border-left: 5px solid transparent;
+              border-right: 5px solid transparent;
+
+              border-top: 5px solid $black;
+            }
+          }
+
+          &:hover {
+            .tooltip {
+              display: block;
+            }
+          }
         }
       }
     }

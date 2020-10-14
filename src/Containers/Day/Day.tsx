@@ -7,7 +7,6 @@ import ContentLoader from "../../Components/ContentLoader";
 import DayDetails from "./DayDetails";
 import useTags from "../Tags/useTags";
 import DayPart from "./DayPart";
-import dayjs from "dayjs";
 import Modal, {modalOptionsI} from "../../Components/Modal";
 import LoaderButton from "../../Components/LoaderButton";
 import chroma from "chroma-js";
@@ -96,7 +95,7 @@ const Day: FC<RouteComponentProps<{ day: string }>> = (props) => {
     },
   })
   const [updating, setUpdating] = useState<number[]>([])
-  const [boxHeight, setBoxHeight] = useState(30)
+  const boxHeight = 30
   const data = useQuery<DayType[], ErrorType>(["today", {day: props.match.params.day}], GetDayQuery, {
     refetchOnWindowFocus: false,
     retryDelay: 200,

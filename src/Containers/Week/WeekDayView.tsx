@@ -63,6 +63,9 @@ const WeekDayView: FC<propsI> = (props) => {
             <div key={`t1-${el.t1}`} className={"t-part"}/>
           )
         })}
+        {props.data.map(day => {
+          return <AllocationPart key={`week-day-allocation-${day.id}`} day={day} />
+        })}
       </div>
       <div className="pie-wrapper">
         {pieData.data.length > 0 && (
@@ -83,7 +86,7 @@ const WeekDayView: FC<propsI> = (props) => {
               tooltips: {
                 displayColors: false,
                 callbacks: {
-                  label: (tooltipItem,data) => {
+                  label: (tooltipItem, data) => {
                     const val = data!.datasets![0].data![tooltipItem.index as number]
                     return `${data!.labels![tooltipItem.index as number]} ${val}%`
                   }
@@ -93,6 +96,41 @@ const WeekDayView: FC<propsI> = (props) => {
           />
         )}
       </div>
+    </div>
+  )
+}
+
+const AllocationPart: FC<{day: DayType}> = ({day}) => {
+  const data = useMemo(() => {
+    // single box height = 10px
+
+    // Calculate allocation height from
+    const boxHeight = ((functions.timeToMinutesNumber(day.end_time) - functions.timeToMinutesNumber(day.start_time)) / 30) * 10
+
+    // Calculate height from top
+    const heightFromTop = (functions.timeToMinutesNumber(day.start_time) / 30) * 10
+
+    return {
+      height: boxHeight,
+      top: heightFromTop
+    }
+  }, [day])
+
+  return (
+    <div
+      style={{
+        top: `${data.top + 12}px`,
+        height: `${data.height - 4}px`,
+        backgroundColor: day.hex_color ? day.hex_color : NoTagColor
+      }}
+      className={"week-day-allocation"}
+      key={`week-day-allocation-${day.id}`}
+    >
+      <div className="tooltip">
+        <p>{day.tag_name ? day.tag_name : "Not Tagged"}</p>
+        <div className="down-triangle" />
+      </div>
+
     </div>
   )
 }
