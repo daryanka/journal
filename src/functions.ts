@@ -22,7 +22,11 @@ const functions = {
       headers.Authorization = `Bearer ${cookie.get("token")}`
     }
 
-    url = `http://localhost:8080${url}`;
+    if (process.env.NODE_ENV === "prod") {
+      url = `https://api-journal.daryanamin.co.uk${url}`;
+    } else {
+      url = `http://localhost:8080${url}`;
+    }
 
 
     const config = _.merge(additionalConfig ? additionalConfig : {}, {

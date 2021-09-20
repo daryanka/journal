@@ -40,15 +40,6 @@ const CreateTag: FC<propsI> = (props) => {
     }
   }, {
     onSuccess: (newData) => {
-      queryCache.setQueryData(["tags"], (data) => {
-        const copy = [...data as TagType[]]
-
-        if (copy) {
-          copy.push(newData)
-        }
-
-        return data
-      })
       queryCache.invalidateQueries(["tags"])
       props.close()
     }

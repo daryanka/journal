@@ -49,7 +49,8 @@ const DayPart: FC<propsI> = ({days, ...props}) => {
       onClick={() => handleClick()}
     >
       {hovering && <BiPlusMedical />}
-      <p className="t1">{functions.timeToMinutesNumber(props.t1)}</p>
+      {/*<p className="t1">{functions.timeToMinutesNumber(props.t1)}</p>*/}
+      <p className="t1">{props.t1}</p>
       {props.last && <p className={"t2"}>{props.t2}</p>}
     </div>
   )

@@ -37,7 +37,7 @@ const Week: FC = (props) => {
       throw err
     }
 
-    const days: {[day in WeekDays]: DayType[] } = {
+    const days: { [day in WeekDays]: DayType[] } = {
       Monday: [],
       Tuesday: [],
       Wednesday: [],
@@ -76,13 +76,13 @@ const Week: FC = (props) => {
       <ContentLoader loading={weekInfo.isLoading || tagsInfo.isLoading}>
         <div className="top">
           <h1>{prettyStart} - {prettyEnd}</h1>
-          <button onClick={nextWeek}>next week</button>
-          <button onClick={lastWeek}>last week</button>
+          <button className={"f"} onClick={lastWeek}>Last Week</button>
+          <button onClick={nextWeek}>Next Week</button>
         </div>
         <div className={"week-days-wrapper"}>
           {weekInfo.data && _.map(weekInfo.data, (el, key) => {
-            return(
-              <WeekDayView tags={tagsInfo.data as TagType[]} data={el} key={`weekday-${key}`} day={key as WeekDays} />
+            return (
+              <WeekDayView tags={tagsInfo.data as TagType[]} data={el} key={`weekday-${key}`} day={key as WeekDays}/>
             )
           })}
         </div>

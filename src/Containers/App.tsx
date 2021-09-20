@@ -80,7 +80,7 @@ const App: FC = () => {
           <Redirect to={"/"}/>
         </Switch>
       </div>
-      <Footer />
+      {/*<Footer />*/}
     </div>
   )
 }
