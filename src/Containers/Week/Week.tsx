@@ -81,8 +81,34 @@ const Week: FC = (props) => {
         </div>
         <div className={"week-days-wrapper"}>
           {weekInfo.data && _.map(weekInfo.data, (el, key) => {
+            let addAmount = 0
+            switch (key) {
+              case "Monday":
+                addAmount = 0
+                break;
+              case "Tuesday":
+                addAmount = 1
+                break;
+              case "Wednesday":
+                addAmount = 2
+                break;
+              case "Thursday":
+                addAmount = 3
+                break;
+              case "Friday":
+                addAmount = 4
+                break;
+              case "Saturday":
+                addAmount = 5
+                break;
+              case "Sunday":
+                addAmount = 6
+                break;
+            }
+
+            const dateString = week.start_day.add(addAmount, "day").format("YYYY-MM-DD")
             return (
-              <WeekDayView tags={tagsInfo.data as TagType[]} data={el} key={`weekday-${key}`} day={key as WeekDays}/>
+              <WeekDayView dateString={dateString} tags={tagsInfo.data as TagType[]} data={el} key={`weekday-${key}`} day={key as WeekDays}/>
             )
           })}
         </div>

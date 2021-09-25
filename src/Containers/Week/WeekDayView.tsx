@@ -10,6 +10,7 @@ interface propsI {
   day: WeekDays
   data: DayType[]
   tags: TagType[]
+  dateString: string
 }
 
 const WeekDayView: FC<propsI> = (props) => {
@@ -55,7 +56,7 @@ const WeekDayView: FC<propsI> = (props) => {
 
   return (
     <div className={"week-day"}>
-      <h2>{props.day}</h2>
+      <h2 onClick={() => functions.pushTo(`/day/${props.dateString}`)} className={"day-title"}>{props.day}</h2>
 
       <div className="day-view">
         {times.map(el => {

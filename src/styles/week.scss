@@ -26,6 +26,9 @@
       box-shadow: 0 0 10px rgba($black, 0.3);
       h2 {
         text-align: center;
+        &:hover {
+          cursor: pointer;
+        }
       }
 
       .day-view {
